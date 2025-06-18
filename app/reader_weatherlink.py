@@ -22,7 +22,8 @@ def read_download(file_path):
     for start, end in colspecs:
         p1 = header_line1[start:end].strip()
         p2 = header_line2[start:end].strip()
-        name = (p1 + p2).strip().replace(" ", "_")
+        name = (p1 + p2).strip()
+        name.replace(" ", "_")
         column_names.append(name)
 
     df = pd.read_fwf(StringIO(data_text), colspecs=colspecs)

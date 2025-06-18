@@ -14,21 +14,22 @@ def load_config(config_path="config.yaml"):
     except yaml.YAMLError as e:
         raise ValueError(f"Error al parsear el archivo YAML: {e}")
 
-    
-def read_download(file_path):
-    df = reader_weatherlink.read_download(file_path)
-    return df
+def weatherlink_read_download(file_path):
+    data_frame = reader_weatherlink.read_download(file_path)
+    return data_frame
 
-def last_values(df):
-    data = reader_weatherlink.last_values(df)
+def weatherlink_last_values(data_frame):
+    data = reader_weatherlink.last_values(data_frame)
     return data
 
-def mqtt_create_client(mqtt_config):
-    broker = mqtt_config["host"]
-    port = mqtt_config["port"]
+def read_weatherlink(file_path):
+    data_frame = weatherlink_read_download(file_path)
+    data = weatherlink_last_values(data_frame)
+    return data
+    
+def mqtt_create_client(broker, port):
     client = mqtt_client.create_client(broker, port)
     return (client)
 
-def mqtt_publish_data(mqtt_config, client_mqtt, data):
-    topic_prefix = mqtt_config["topic_prefix"]
+def mqtt_publish_data(topic_prefix, client_mqtt, data):
     mqtt_client.publish_data(topic_prefix, client_mqtt, data)
