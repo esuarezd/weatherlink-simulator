@@ -1,19 +1,10 @@
-import pandas as pd
+import pandas
 import logging
+
+logger = logging.getLogger(__name__)
+
 from io import StringIO
 
-# Definir la ruta del directorio de logs 
-log_file = 'log/reader_weatherlink.log'
-
-# Configurar el sistema de logging
-logging.basicConfig(
-    level=logging.INFO,  # Nivel de severidad (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-    format="%(asctime)s [%(levelname)s] %(message)s",  # Formato del mensaje
-    handlers=[
-        logging.StreamHandler(),  # Mostrar en la terminal
-        logging.FileHandler(log_file, mode="a")  # Registrar en un archivo
-    ]
-)
 
 def read_download(file_path):
     try:
@@ -45,21 +36,21 @@ def read_download(file_path):
             name.replace(" ", "_")
             column_names.append(name)
 
-        df = pd.read_fwf(StringIO(data_text), colspecs=colspecs)
+        df = pandas.read_fwf(StringIO(data_text), colspecs=colspecs)
         df.columns = column_names
         return df
     
     except FileNotFoundError:
-        logging.error(f"[READER] El archivo no fue encontrado: {file_path}")
+        logger.error(f"El archivo no fue encontrado: {file_path}")
         raise
     except ValueError as ve:
-        logging.error(f"[READER] Valor inválido en el archivo '{file_path}': {ve}")
+        logger.error(f"Valor inválido en el archivo '{file_path}': {ve}")
         raise
     except IndexError:
-        logging.error(f"[READER] El archivo tiene un formato inválido (faltan líneas): {file_path}")
+        logger.error(f"El archivo tiene un formato inválido (faltan líneas): {file_path}")
         raise
     except Exception as e:
-        logging.error(f"[READER] Error inesperado al leer el archivo '{file_path}': {e}")
+        logger.error(f"Error inesperado al leer el archivo '{file_path}': {e}")
         raise
 
 def last_values(df):
@@ -67,8 +58,8 @@ def last_values(df):
         latest_row = df.iloc[-1]
         return latest_row.to_dict()
     except IndexError:
-        logging.error("[READER] El DataFrame está vacío, no se pueden obtener valores.")
+        logger.error("El DataFrame está vacío, no se pueden obtener valores.")
         raise
     except Exception as e:
-        logging.error(f"[READER] Error inesperado al obtener la última fila del DataFrame: {e}")
+        logger.error(f"Error inesperado al obtener la última fila del DataFrame: {e}")
         raise
