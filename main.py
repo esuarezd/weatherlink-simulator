@@ -29,7 +29,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s",  # Formato del mensaje
     handlers=[
         logging.StreamHandler(),  # Mostrar en la terminal
-        logging.FileHandler(log_file, mode="a")  # Registrar en un archivo
+        logging.FileHandler(log_file, mode="a", encoding="utf-8-sig")  # Registrar en un archivo
     ]
 )
 
