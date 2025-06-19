@@ -54,7 +54,7 @@ Este proyecto permite leer datos generados por una estación meteorológica Davi
    python main.py
    ```
 
-Los logs se almacenarán en la carpeta `log/`, con un archivo para cada módulo (`view.log`, `logic.log`, `mqtt_client.log`, etc.).
+Los logs se almacenarán en la carpeta `log/`.
 
 ---
 

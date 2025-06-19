@@ -81,7 +81,7 @@ def read_weatherlink(file_path):
         logger.error(f"Error interno al leer Weatherlink: {e}")
         raise
     
-def mqtt_create_client(broker, port):
+def mqtt_create_client(broker="localhost", port=1883):
     client = mqtt_client.create_client(broker, port)
     return client
 
