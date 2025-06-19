@@ -1,16 +1,30 @@
 import paho.mqtt.client as mqtt
 import json
+import logging
+
+# Definir la ruta del directorio de logs 
+log_file = 'log/mqtt_client.log'
+
+# Configurar el sistema de logging
+logging.basicConfig(
+    level=logging.INFO,  # Nivel de severidad (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format="%(asctime)s [%(levelname)s] %(message)s",  # Formato del mensaje
+    handlers=[
+        logging.StreamHandler(),  # Mostrar en la terminal
+        logging.FileHandler(log_file, mode="a")  # Registrar en un archivo
+    ]
+)
 
 # Callback que se ejecuta cuando el cliente se conecta al broker. 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
-        print("[MQTT] Conectado exitosamente al broker")
+        logging.info("[MQTT] Conectado exitosamente al broker")
     else:
-        print(f"[MQTT] Error de conexión: código {rc}")
+        logging.error(f"[MQTT] Error de conexión: código {rc}")
 
 # Callback que se ejecuta si el cliente se desconecta.
 def on_disconnect(client, userdata, rc):
-    print(f"[MQTT] Desconectado. Código: {rc}")
+    logging.warning(f"[MQTT] Desconectado. Código: {rc}")
             
 def create_client(broker="localhost", port=1883):
     client = mqtt.Client()
@@ -31,14 +45,15 @@ def create_client(broker="localhost", port=1883):
         client.connect(broker, port, 60)
     except Exception as e:
         # Si falla, el cliente seguirá intentando reconectarse en segundo plano gracias a loop_start
-        print(f"[MQTT] Error al conectar: {e}")
+        logging.error(f"[MQTT] Error al conectar al broker {broker}:{port} - {e}")
+        raise ConnectionError(f"No se pudo conectar al broker MQTT {broker}:{port}") from e
         
     return client
 
 def publish_data(topic_prefix, client, data):
     
     if not client.is_connected():
-        print("[MQTT] Cliente no conectado. Se espera que reconecte automáticamente...")
+        logging.warning("[MQTT] Cliente no conectado. Se espera que reconecte automáticamente...")
         return
     
     topic = f"{topic_prefix}/data"
@@ -48,4 +63,4 @@ def publish_data(topic_prefix, client, data):
     result.wait_for_publish()
     
     if result.rc != mqtt.MQTT_ERR_SUCCESS:
-        print(f"[ERROR] Publicación fallida: {mqtt.error_string(result.rc)}")
+        logging.error(f"[MQTT] Publicación fallida: {mqtt.error_string(result.rc)}")
