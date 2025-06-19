@@ -73,7 +73,7 @@ def main():
     while True:
         data = read_weatherlink(file_path)
         if data:
-            data["timestamp"] = build_epoch_timestamp(data.get("_Date", ""), data.get("_Time", ""), station_config.get("timezone", "UTC"))
+            data["timestamp"] = build_epoch_timestamp(data.get("Date", ""), data.get("Time", ""), station_config.get("timezone", "UTC"))
             publish_data(mqtt_config["topic_prefix"], client_mqtt, data)
         time.sleep(interval_sec)
     
