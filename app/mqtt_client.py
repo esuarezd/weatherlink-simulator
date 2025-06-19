@@ -56,11 +56,20 @@ def publish_data(topic_prefix, client, data):
         logging.warning("[MQTT] Cliente no conectado. Se espera que reconecte automáticamente...")
         return
     
-    topic = f"{topic_prefix}/data"
-    payload = json.dumps(data)
+    try:
         
-    result = client.publish(topic, payload)
-    result.wait_for_publish()
+        topic = f"{topic_prefix}/data"
+        payload = json.dumps(data)
+            
+        result = client.publish(topic, payload)
+        result.wait_for_publish()
+        
+        if result.rc != mqtt.MQTT_ERR_SUCCESS:
+            error_msg = mqtt.error_string(result.rc)
+            logging.error(f"[MQTT] Publicación fallida: {error_msg}")
+            raise RuntimeError(f"Error al publicar en MQTT: {error_msg}")
     
-    if result.rc != mqtt.MQTT_ERR_SUCCESS:
-        logging.error(f"[MQTT] Publicación fallida: {mqtt.error_string(result.rc)}")
+    except Exception as e:
+        logging.error(f"[MQTT] Excepción durante la publicación: {e}")
+        raise
+        

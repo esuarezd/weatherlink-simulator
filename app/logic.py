@@ -51,7 +51,7 @@ def read_weatherlink(file_path):
     
 def mqtt_create_client(broker, port):
     client = mqtt_client.create_client(broker, port)
-    return (client)
+    return client
 
 def mqtt_publish_data(topic_prefix, client_mqtt, data):
     mqtt_client.publish_data(topic_prefix, client_mqtt, data)

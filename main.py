@@ -1,12 +1,12 @@
 import os
-from app import view
 
 # Definir la ruta del directorio de logs 
 log_dir = 'log'
 
-# Crear las carpetas 'logs' y 'logs/collection' si no existen
+# Crear las carpetas log si no existe
 os.makedirs(log_dir, exist_ok=True)
 
+from app import view
     
 # Main function
 def main():
