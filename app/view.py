@@ -33,6 +33,12 @@ def read_weatherlink(file_path):
         logger.error(f"Error al leer datos desde WeatherLink: {e}")
         return None
 
+def build_epoch_timestamp(date_str, time_str, timezone_str):
+    try:
+        return logic.build_epoch_timestamp(date_str, time_str, timezone_str)
+    except Exception as e:
+        logger.error(f"Error al crear estampa de tiempo: {e}")
+    
 def publish_data(topic_prefix, client_mqtt, data):
     try:
         logic.mqtt_publish_data(topic_prefix, client_mqtt, data)
@@ -67,6 +73,7 @@ def main():
     while True:
         data = read_weatherlink(file_path)
         if data:
+            data["timestamp"] = build_epoch_timestamp(data.get("_Date", ""), data.get("_Time", ""), station_config.get("timezone", "UTC"))
             publish_data(mqtt_config["topic_prefix"], client_mqtt, data)
         time.sleep(interval_sec)
     

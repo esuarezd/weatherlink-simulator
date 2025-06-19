@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 from app import reader_weatherlink
 from app import mqtt_client
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 def load_config(config_path="config.yaml"):
     if not os.path.exists(config_path):
@@ -41,6 +43,34 @@ def weatherlink_read_download(file_path):
 def weatherlink_last_values(data_frame):
     data = reader_weatherlink.last_values(data_frame)
     return data
+
+def build_epoch_timestamp(date_str="18/06/25", time_str="4:10p", timezone_str="UTC"):
+    try:
+        if not date_str or not time_str:
+            raise ValueError("Faltan datos de fecha u hora")
+
+        # Convertir "12:45p" a formato 24h: "12:45 PM"
+        if time_str.endswith('a'):
+            time_fmt = time_str[:-1] + " AM"
+        elif time_str.endswith('p'):
+            time_fmt = time_str[:-1] + " PM"
+        else:
+            raise ValueError(f"Formato de hora inválido: {time_str}")
+
+        # Construir datetime
+        full_str = f"{date_str} {time_fmt}"  # ej: "18/06/25 12:45 PM"
+        dt = datetime.strptime(full_str, "%d/%m/%y %I:%M %p")
+
+        # Asignar zona horaria
+        tz = ZoneInfo(timezone_str)
+        dt = dt.replace(tzinfo=tz)
+
+        # Convertir a epoch (segundos desde 1970 UTC)
+        return int(dt.timestamp())
+
+    except Exception as e:
+        logger.error(f"Error construyendo timestamp: {e}")
+        return None
 
 def read_weatherlink(file_path):
     try:
