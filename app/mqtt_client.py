@@ -47,7 +47,7 @@ def create_client(broker="localhost", port=1883):
         client.connect(broker, port, 60)
     except Exception as e:
         # Si falla, el cliente seguirá intentando reconectarse en segundo plano gracias a loop_start
-        logger.error(f"Error al conectar al broker {broker}:{port} - {e}")
+        logger.error(f"No se pudo conectar al broker MQTT {broker}:{port} - {e}")
         raise ConnectionError(f"No se pudo conectar al broker MQTT {broker}:{port}") from e
         
     return client
@@ -56,7 +56,7 @@ def publish_data(data, client_mqtt, topic_prefix="weatherstation"):
     
     if not client_mqtt.is_connected():
         logger.warning("Cliente no conectado. Se espera que reconecte automáticamente...")
-        return
+        raise
     
     try:
         
@@ -70,6 +70,8 @@ def publish_data(data, client_mqtt, topic_prefix="weatherstation"):
             error_msg = mqtt.error_string(result.rc)
             logger.error(f"Publicación fallida: {error_msg}")
             raise RuntimeError(f"Error al publicar en MQTT: {error_msg}")
+        else:
+            logger.info(f"Datos publicados: {payload}")
     
     except Exception as e:
         logger.error(f"Excepción durante la publicación: {e}")

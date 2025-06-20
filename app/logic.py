@@ -85,21 +85,22 @@ def mqtt_create_client(broker="localhost", port=1883):
     client = mqtt_client.create_client(broker, port)
     return client
 
-def publish_data(data, client_mqtt, last_time, topic_prefix, timezone_str):
+def publish_data(data, client_mqtt, last_timestamp, topic_prefix, timezone_str):
     try:
         if data:
             date_str = data.get("Date")
             time_str = data.get("Time")
+            current_timestamp = build_epoch_timestamp(date_str, time_str, timezone_str)
             
-            if time_str == last_time:
-                logger.info(f"No hay nueva data")
+            if current_timestamp == last_timestamp:
+                logger.info(f"No hay nuevos datos para publicar")
             else:
-                timestamp = build_epoch_timestamp(date_str, time_str, timezone_str)
-                data["timestamp"] = timestamp
+                data["timestamp"] = current_timestamp
                 mqtt_client.publish_data(data, client_mqtt, topic_prefix)
-                last_time = time_str
+                
+                return current_timestamp
             
-        return last_time
+        return last_timestamp
     except Exception as e:
         logger.error(f"Excepción durante la publicación: {e}")
         raise

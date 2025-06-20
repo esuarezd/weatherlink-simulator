@@ -41,9 +41,7 @@ def read_weatherlink(file_path):
     
 def publish_data(data, client_mqtt, last_time, topic_prefix, timezone_str):
     try:
-        time_str = logic.publish_data(data, client_mqtt, last_time, topic_prefix, timezone_str)
-        logger.info(f"Datos publicados: \n{data}")
-        return time_str
+        return logic.publish_data(data, client_mqtt, last_time, topic_prefix, timezone_str)
     except Exception as e:
         logger.error(f"Error al publicar datos vía MQTT: {e}")
         
@@ -76,11 +74,11 @@ def main():
     topic_prefix = mqtt_config.get("topic_prefix")
     
     client_mqtt = create_client(host, port)
-    last_time = 0
+    last_timestamp = 0
     
     while True:
         data = read_weatherlink(file_path)
-        last_time = publish_data(data, client_mqtt, last_time, topic_prefix, timezone_str)
+        last_timestamp = publish_data(data, client_mqtt, last_timestamp, topic_prefix, timezone_str)
         
         time.sleep(interval_sec)
     
