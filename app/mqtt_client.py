@@ -52,9 +52,9 @@ def create_client(broker="localhost", port=1883):
         
     return client
 
-def publish_data(topic_prefix, client, data):
+def publish_data(data, client_mqtt, topic_prefix="weatherstation"):
     
-    if not client.is_connected():
+    if not client_mqtt.is_connected():
         logger.warning("Cliente no conectado. Se espera que reconecte automáticamente...")
         return
     
@@ -63,7 +63,7 @@ def publish_data(topic_prefix, client, data):
         topic = f"{topic_prefix}/data"
         payload = json.dumps(data)
             
-        result = client.publish(topic, payload)
+        result = client_mqtt.publish(topic, payload)
         result.wait_for_publish()
         
         if result.rc != mqtt.MQTT_ERR_SUCCESS:

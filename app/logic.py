@@ -44,7 +44,7 @@ def weatherlink_last_values(data_frame):
     data = reader_weatherlink.last_values(data_frame)
     return data
 
-def build_epoch_timestamp(date_str="18/06/25", time_str="4:10p", timezone_str="UTC"):
+def build_epoch_timestamp(date_str="18/06/25", time_str="4:10p", timezone_str="America/Bogota"):
     try:
         if not date_str or not time_str:
             raise ValueError("Faltan datos de fecha u hora")
@@ -85,5 +85,22 @@ def mqtt_create_client(broker="localhost", port=1883):
     client = mqtt_client.create_client(broker, port)
     return client
 
-def mqtt_publish_data(topic_prefix, client_mqtt, data):
-    mqtt_client.publish_data(topic_prefix, client_mqtt, data)
+def publish_data(data, client_mqtt, last_time, topic_prefix, timezone_str):
+    try:
+        if data:
+            date_str = data.get("Date")
+            time_str = data.get("Time")
+            
+            if time_str == last_time:
+                logger.info(f"No hay nueva data")
+            else:
+                timestamp = build_epoch_timestamp(date_str, time_str, timezone_str)
+                data["timestamp"] = timestamp
+                mqtt_client.publish_data(data, client_mqtt, topic_prefix)
+                last_time = time_str
+            
+        return last_time
+    except Exception as e:
+        logger.error(f"Excepción durante la publicación: {e}")
+        raise
+    

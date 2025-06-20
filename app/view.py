@@ -38,17 +38,12 @@ def read_weatherlink(file_path):
     except Exception as e:
         logger.error(f"Error al leer datos desde WeatherLink: {e}")
         return None
-
-def build_epoch_timestamp(date_str, time_str, timezone_str):
-    try:
-        return logic.build_epoch_timestamp(date_str, time_str, timezone_str)
-    except Exception as e:
-        logger.error(f"Error al crear estampa de tiempo: {e}")
     
-def publish_data(topic_prefix, client_mqtt, data):
+def publish_data(data, client_mqtt, last_time, topic_prefix, timezone_str):
     try:
-        logic.mqtt_publish_data(topic_prefix, client_mqtt, data)
+        time_str = logic.publish_data(data, client_mqtt, last_time, topic_prefix, timezone_str)
         logger.info(f"Datos publicados: \n{data}")
+        return time_str
     except Exception as e:
         logger.error(f"Error al publicar datos vía MQTT: {e}")
         
@@ -67,6 +62,7 @@ def main():
     station_name = station_config["name"]
     file_path = station_config["file_path"]
     archive_interval_min = station_config.get("archive_interval", 5)
+    timezone_str = station_config.get("timezone")
     
     interval_sec = archive_interval_min * 60
 
@@ -78,24 +74,13 @@ def main():
     host = mqtt_config.get("host")
     port = mqtt_config.get("port")
     topic_prefix = mqtt_config.get("topic_prefix")
+    
     client_mqtt = create_client(host, port)
-    last_timestamp = 0
+    last_time = 0
     
     while True:
         data = read_weatherlink(file_path)
-        if data:
-            date_str = data.get("Date")
-            time_str = data.get("Time")
-            timezone_str = station_config.get("timezone")
-            
-            timestamp = build_epoch_timestamp(date_str, time_str, timezone_str)
-            
-            if timestamp == last_timestamp:
-                logger.info(f"No se publica. Timestamp repetido: {timestamp}")
-            else:
-                data["timestamp"] = timestamp
-                publish_data(topic_prefix, client_mqtt, data)
-                last_timestamp = timestamp
+        last_time = publish_data(data, client_mqtt, last_time, topic_prefix, timezone_str)
         
         time.sleep(interval_sec)
     
