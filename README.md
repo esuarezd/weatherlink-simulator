@@ -1,6 +1,6 @@
-# WeatherLink MQTT Publisher
+# WeatherLink Simulator
 
-Este proyecto permite leer datos generados por una estación meteorológica Davis desde un archivo plano exportado por WeatherLink, y publicarlos en un broker MQTT para su posterior uso en aplicaciones IoT o repositorio de datos.
+Este proyecto simula datos de una estación meteorológica Davis y los publica en un broker MQTT para su posterior uso en aplicaciones IoT o repositorio de datos.
 
 ---
 
@@ -17,8 +17,8 @@ Este proyecto permite leer datos generados por una estación meteorológica Davi
    - **Clona este repositorio:**
 
      ```bash
-     git clone https://github.com/tu_usuario/weatherlink-mqtt.git
-     cd weatherlink-mqtt
+     git clone https://github.com/tu_usuario/weatherlink-simulator.git
+     cd weatherlink-simulator
      ```
 
    - **Crea y activa un entorno virtual:**
@@ -73,3 +73,5 @@ Edison Suárez Ducón
 ## Contacto
 
 Para dudas o contribuciones, por favor abre un issue en el repositorio o contáctame directamente.
+e.suarezd at uniandes.edu.co
+Universidad de los Andes
